@@ -1,1 +1,165 @@
-[]
+- id: '1597940781055'
+  alias: check mqtt
+  description: ''
+  trigger:
+  - payload: online
+    platform: mqtt
+    topic: hass/status
+  condition: []
+  action:
+  - device_id: 2ed7a1563bc943c29f18f5fb8887c73b
+    domain: light
+    entity_id: light.hall1
+    type: flash
+  mode: single
+- id: '1598082405271'
+  alias: EntryWay Light On
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.entryway_light
+    event_type: timer.started
+    platform: event
+  condition: []
+  action:
+  - brightness_pct: 100
+    device_id: 5cd7684b02644dddaa5db5324835008b
+    domain: light
+    entity_id: light.entryway_light
+    type: turn_on
+  - brightness_pct: 100
+    device_id: 8f5e5816b4c243e093a1a6e571ce8943
+    domain: light
+    entity_id: light.entryway_color
+    type: turn_on
+  - data: {}
+    entity_id: timer.entryway_light
+    service: timer.start
+  mode: single
+- id: '1598083829270'
+  alias: EntryWay Light Off
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.entryway_light
+    event_type: timer.finished
+    platform: event
+  condition: []
+  action:
+  - device_id: 5cd7684b02644dddaa5db5324835008b
+    domain: light
+    entity_id: light.entryway_light
+    type: turn_off
+  - device_id: 8f5e5816b4c243e093a1a6e571ce8943
+    domain: light
+    entity_id: light.entryway_color
+    type: turn_off
+  mode: single
+- id: '1598084438826'
+  alias: HallWay Light Off
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.hallway_light
+    event_type: timer.finished
+    platform: event
+  condition: []
+  action:
+  - device_id: 2ed7a1563bc943c29f18f5fb8887c73b
+    domain: light
+    entity_id: light.hall1
+    type: turn_off
+  - device_id: 34673143b0da42bbbe15de2ef8252ddb
+    domain: light
+    entity_id: light.hall2
+    type: turn_off
+  mode: single
+- id: '1598084708745'
+  alias: HallWay Light On
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.hallway_light
+    event_type: timer.started
+    platform: event
+  condition: []
+  action:
+  - brightness_pct: 100
+    device_id: 2ed7a1563bc943c29f18f5fb8887c73b
+    domain: light
+    entity_id: light.hall1
+    type: turn_on
+  - brightness_pct: 100
+    device_id: 34673143b0da42bbbe15de2ef8252ddb
+    domain: light
+    entity_id: light.hall2
+    type: turn_on
+  - data: {}
+    entity_id: timer.hallway_light
+    service: timer.start
+  mode: single
+- id: '1598087218306'
+  alias: 'HallWay Motion Timer '
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.0x00158d00015a89ae_occupancy
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.0x00158d00015a892a_occupancy
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data: {}
+    service: script.hallway_timer_restart
+  mode: single
+- id: '1598088356341'
+  alias: EntryWay Motion TImer
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.0x00158d00015a895c_occupancy
+    platform: state
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.0x00158d0001210aa8_contact
+    state: 'off'
+  action:
+  - entity_id: timer.entryway_light
+    service: script.entryway_timer_restart
+  mode: single
+- id: '1598107653741'
+  alias: Front Door Open
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.0x00158d0001210aa8_contact
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - brightness_pct: 100
+    device_id: 8f5e5816b4c243e093a1a6e571ce8943
+    domain: light
+    entity_id: light.entryway_color
+    type: turn_on
+  - brightness_pct: 100
+    device_id: 5cd7684b02644dddaa5db5324835008b
+    domain: light
+    entity_id: light.entryway_light
+    type: turn_on
+  - data: {}
+    entity_id: timer.entryway_light
+    service: timer.cancel
+  mode: single
+- id: '1598108866745'
+  alias: Front Door Close
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.0x00158d0001210aa8_contact
+    platform: state
+    to: 'off'
+  condition: []
+  action:
+  - data: {}
+    service: script.entryway_timer_restart
+  mode: single

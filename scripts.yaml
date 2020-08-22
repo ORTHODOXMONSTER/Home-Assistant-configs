@@ -1,0 +1,20 @@
+hallway_timer_restart:
+  alias: Hallway Timer Restart
+  mode: single
+  sequence:
+  - data: {}
+    entity_id: timer.hallway_light
+    service: timer.cancel
+  - data: {}
+    entity_id: timer.hallway_light
+    service: timer.start
+entryway_timer_restart:
+  alias: EntryWay Timer Restart
+  mode: single
+  sequence:
+  - data: {}
+    entity_id: timer.entryway_light
+    service: timer.cancel
+  - data: {}
+    entity_id: timer.entryway_light
+    service: timer.start

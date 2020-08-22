@@ -3,6 +3,12 @@
 default_config:
 #this is a test
 
+timer:
+  entryway_light:
+    duration: '00:02:00'
+  hallway_light:
+    duration: '00:02:00'
+  
 # Text to speech
 tts:
   - platform: google_translate
