@@ -1,15 +1,75 @@
-  version: '3'
-  services:
-    zigbee2mqtt:
-      container_name: zigbee2mqtt
-      image: koenkk/zigbee2mqtt
-      volumes:
-        - ./data:/app/data
-        - /run/udev:/run/udev:ro
-      devices:
-        - /dev/ttyACM0:/dev/ttyACM0
-      restart: always
-      network_mode: host
-      privileged: true
-      environment:
-        - TZ=America/Chicago
+version: '3'
+services:
+### Home Assistant ############################
+
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/home-assistant:stable
+    volumes:
+      - /home/pi/homeassistant:/config
+    environment:
+      - TZ=America/Chicago
+    restart: always
+    network_mode: host
+
+### Pi-Hole ###################################
+
+  # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: 'America/Chicago'
+      # WEBPASSWORD: 'set a secure password here or it will be random'
+    volumes:
+       - '/home/pi/homeassistant/pi-hole:/etc/pihole/'
+       - '/home/pi/homeassistant/pi-hole/dnsmasq:/etc/dnsmasq.d/'
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped 
+ 
+   ### Setup interface password ###
+   #docker exec -it pihole pihole -a -p <Password>
+
+### Mosquitto #################################
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - /home/pi/homeassistant/mqtt/data:/mosquitto/data
+      - /home/pi/homeassistant/mqtt/log:/mosquitto/log
+      - /home/pi/homeassistant/mqtt/config:/mosquitto/config
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+    ### setup password file next 2 steps ###
+    #sudo docker exec -it mqtt sh
+    #mosquitto_passwd -c /mosquitto/config/pwfile hass
+
+### Zigbee2mqtt ###############################
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - ./data-zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+    restart: always
+    network_mode: host
+    privileged: true
+    environment:
+      - TZ=America/Chicago
