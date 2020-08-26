@@ -116,6 +116,9 @@
   - data: {}
     entity_id: timer.entryway_light
     service: timer.cancel
+  - data: {}
+    entity_id: timer.porch_light
+    service: timer.cancel
   mode: single
 - id: '1598108866745'
   alias: Front Door Close
@@ -128,6 +131,8 @@
   action:
   - data: {}
     service: script.entryway_timer_restart
+  - data: {}
+    service: script.porch_light_timer
   mode: single
 - id: enable_zigbee_join
   alias: Enable Zigbee joining
@@ -283,4 +288,35 @@
   - data: {}
     entity_id: media_player.living_room_home
     service: media_player.turn_off
+  mode: single
+- id: '1598458709655'
+  alias: Porch Light On
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.porch_light
+    event_type: timer.started
+    platform: event
+  condition: []
+  action:
+  - brightness_pct: 100
+    device_id: 49e6e738907b43beb714d6b270440bda
+    domain: light
+    entity_id: light.front_exterior_door
+    type: turn_on
+  mode: single
+- id: '1598458818504'
+  alias: Porch Light Off
+  description: ''
+  trigger:
+  - event_data:
+      entity_id: timer.porch_light
+    event_type: timer.finished
+    platform: event
+  condition: []
+  action:
+  - device_id: 49e6e738907b43beb714d6b270440bda
+    domain: light
+    entity_id: light.front_exterior_door
+    type: turn_off
   mode: single

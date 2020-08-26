@@ -23,10 +23,10 @@ porch_light_timer:
   mode: single
   sequence:
   - data: {}
-    entity_id: timer.portch_light
+    entity_id: timer.porch_light
     service: timer.cancel
   - data: {}
-    entity_id: timer.portch_light
+    entity_id: timer.porch_light
     service: timer.start
 entryway_half_brightness:
   alias: Entryway Half Brightness
