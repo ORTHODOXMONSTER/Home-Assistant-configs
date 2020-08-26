@@ -18,3 +18,91 @@ entryway_timer_restart:
   - data: {}
     entity_id: timer.entryway_light
     service: timer.start
+porch_light_timer:
+  alias: Porch Light Timer
+  mode: single
+  sequence:
+  - data: {}
+    entity_id: timer.portch_light
+    service: timer.cancel
+  - data: {}
+    entity_id: timer.portch_light
+    service: timer.start
+entryway_half_brightness:
+  alias: Entryway Half Brightness
+  mode: single
+  sequence:
+  - data:
+      brightness: 75
+    entity_id: light.entryway
+    service: light.turn_on
+entryway_full_brightness:
+  alias: Entryway Full Brightness
+  mode: single
+  sequence:
+  - data:
+      brightness: 255
+    entity_id: light.entryway
+    service: light.turn_on
+'1598406189605':
+  alias: Entryway Conditional Brightness
+  mode: single
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states("light.lvrm_left") and states("light.lvrm_right")  !=
+          "on" and states("media_player.roku_ultra") == ''playing'' }}'
+      sequence:
+      - data:
+          brightness: 25
+        entity_id: light.entryway
+        service: light.turn_on
+    default: []
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states("light.lvrm_left") and states("light.lvrm_right")  ==
+          "on" }}'
+      sequence:
+      - data:
+          brightness: 255
+        entity_id: light.entryway
+        service: light.turn_on
+    default: []
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states("light.lvrm_left") and states("light.lvrm_right")  !=
+          "on"}}'
+      sequence:
+      - data:
+          brightness: 75
+        service: light.turn_on
+    default: []
+hallway_conditional_brightness:
+  alias: Hallway Conditional Brightness
+  mode: single
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states("light.lvrm_left") and states("light.lvrm_right")  !=
+          "on" }}'
+      sequence:
+      - data:
+          brightness: 25
+        entity_id: light.hallway
+        service: light.turn_on
+    default: []
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ states("light.lvrm_left") and states("light.lvrm_right")  ==
+          "on" }}'
+      sequence:
+      - data:
+          brightness: 255
+        entity_id: light.hallway
+        service: light.turn_on
+    default: []

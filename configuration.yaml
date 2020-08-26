@@ -1,14 +1,38 @@
 
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
-#this is a test
+##this is a test
+
+input_boolean:
+  zigbee_permit_join:
+    name: Allow devices to join
+    initial: off
+    icon: mdi:cellphone-wireless
 
 timer:
   entryway_light:
-    duration: '00:02:00'
+    duration: '00:02:30'
   hallway_light:
     duration: '00:02:00'
-  
+  porch_light:
+    duration: '00:02:00'
+  zigbee_permit_join:
+    name: Time remaining
+    duration: 600 # Updated this to the number of seconds you wish
+  googlehome_timeout:
+    name: Google Home Time Out
+    duration: '00:01:00'
+
+sensor:
+  - platform: mqtt
+    name: Bridge state
+    state_topic: "zigbee2mqtt/bridge/state"
+    icon: mdi:router-wireless
+  - platform: mqtt
+    name: Pairing 
+    state_topic: "zigbee2mqtt/bridge/config/permit_join"
+    icon: mdi:router-wireless
+
 # Text to speech
 tts:
   - platform: google_translate
@@ -17,3 +41,11 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+#customize: !include customize.yaml
+logbook:
+  exclude:
+    domains:
+      - updater
+      - media_player
+    entities:
+      - sensor.ups_status_date

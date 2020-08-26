@@ -1,17 +1,3 @@
-- id: '1597940781055'
-  alias: check mqtt
-  description: ''
-  trigger:
-  - payload: online
-    platform: mqtt
-    topic: hass/status
-  condition: []
-  action:
-  - device_id: 2ed7a1563bc943c29f18f5fb8887c73b
-    domain: light
-    entity_id: light.hall1
-    type: flash
-  mode: single
 - id: '1598082405271'
   alias: EntryWay Light On
   description: ''
@@ -22,19 +8,9 @@
     platform: event
   condition: []
   action:
-  - brightness_pct: 100
-    device_id: 5cd7684b02644dddaa5db5324835008b
-    domain: light
-    entity_id: light.entryway_light
-    type: turn_on
-  - brightness_pct: 100
-    device_id: 8f5e5816b4c243e093a1a6e571ce8943
-    domain: light
-    entity_id: light.entryway_color
-    type: turn_on
   - data: {}
-    entity_id: timer.entryway_light
-    service: timer.start
+    entity_id: script.1598406189605
+    service: script.turn_on
   mode: single
 - id: '1598083829270'
   alias: EntryWay Light Off
@@ -84,19 +60,9 @@
     platform: event
   condition: []
   action:
-  - brightness_pct: 100
-    device_id: 2ed7a1563bc943c29f18f5fb8887c73b
-    domain: light
-    entity_id: light.hall1
-    type: turn_on
-  - brightness_pct: 100
-    device_id: 34673143b0da42bbbe15de2ef8252ddb
-    domain: light
-    entity_id: light.hall2
-    type: turn_on
   - data: {}
-    entity_id: timer.hallway_light
-    service: timer.start
+    entity_id: script.hallway_conditional_brightness
+    service: script.turn_on
   mode: single
 - id: '1598087218306'
   alias: 'HallWay Motion Timer '
@@ -162,4 +128,159 @@
   action:
   - data: {}
     service: script.entryway_timer_restart
+  mode: single
+- id: enable_zigbee_join
+  alias: Enable Zigbee joining
+  trigger:
+    platform: state
+    entity_id: input_boolean.zigbee_permit_join
+    to: 'on'
+  action:
+  - service: mqtt.publish
+    data:
+      topic: zigbee2mqtt/bridge/config/permit_join
+      payload: 'true'
+  - service: timer.start
+    data:
+      entity_id: timer.zigbee_permit_join
+- id: disable_zigbee_join
+  alias: Disable Zigbee joining
+  trigger:
+  - entity_id: input_boolean.zigbee_permit_join
+    platform: state
+    to: 'off'
+  action:
+  - data:
+      payload: 'false'
+      topic: zigbee2mqtt/bridge/config/permit_join
+    service: mqtt.publish
+  - data:
+      entity_id: timer.zigbee_permit_join
+    service: timer.cancel
+- id: disable_zigbee_join_timer
+  alias: Disable Zigbee joining by timer
+  trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.zigbee_permit_join
+  action:
+  - service: mqtt.publish
+    data:
+      topic: zigbee2mqtt/bridge/config/permit_join
+      payload: 'false'
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.zigbee_permit_join
+- id: '1598132041275'
+  alias: Entryway Timer Restart At Startup
+  description: ''
+  trigger:
+  - event: start
+    platform: homeassistant
+  condition:
+  - condition: state
+    entity_id: light.entryway
+    state: 'on'
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.0x00158d0001210aa8_contact
+      state: 'off'
+  action:
+  - data: {}
+    service: script.entryway_timer_restart
+  mode: single
+- id: '1598160423749'
+  alias: Porch Motion
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.0x00158d00015a89fe_occupancy
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data: {}
+    service: script.porch_light_timer
+  mode: single
+- id: '1598373764763'
+  alias: Play/Pause Google Home LivingRoom
+  description: ''
+  trigger:
+  - device_id: 1af8929a64334fd4a91c61b74d753cba
+    discovery_id: 0x00158d0001f3a776 action_single
+    domain: mqtt
+    platform: device
+    subtype: single
+    type: action
+  - device_id: 63d3d7dfd660479f8e15a6de942b28fb
+    discovery_id: 0x00158d00013f9b9e action_single
+    domain: mqtt
+    platform: device
+    subtype: single
+    type: action
+  condition:
+  - condition: template
+    value_template: '{{ states("media_player.living_kitchen") != ''playing'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.living_room_home") != ''idle'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.roku_ultra") != ''playing'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.roku_ultra") != ''paused'' }}'
+  action:
+  - data:
+      entity_id: media_player.living_room_home
+    entity_id: media_player.living_room_home
+    service: media_player.media_play_pause
+  mode: single
+- id: '1598376324308'
+  alias: Play/Pause Roku
+  description: ''
+  trigger:
+  - device_id: 1af8929a64334fd4a91c61b74d753cba
+    discovery_id: 0x00158d0001f3a776 action_single
+    domain: mqtt
+    platform: device
+    subtype: single
+    type: action
+  - device_id: 63d3d7dfd660479f8e15a6de942b28fb
+    discovery_id: 0x00158d00013f9b9e action_single
+    domain: mqtt
+    platform: device
+    subtype: single
+    type: action
+  condition:
+  - condition: template
+    value_template: '{{ states("media_player.roku_ultra") != ''idle'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.roku_ultra") != ''home'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.living_kitchen") != ''playing'' }}'
+  - condition: template
+    value_template: '{{ states("media_player.living_room_home") != ''playing'' }}'
+  action:
+  - data:
+      entity_id: media_player.roku_ultra
+    entity_id: media_player.roku_ultra
+    service: media_player.media_play_pause
+  mode: single
+- id: '1598387284833'
+  alias: Google Home Timeout
+  description: ''
+  trigger:
+  - entity_id: media_player.living_room_home
+    for: 00:10:00
+    from: playing
+    platform: state
+    to: paused
+  - entity_id: media_player.roku_ultra
+    for: 00:03:00
+    platform: state
+    to: playing
+  condition: []
+  action:
+  - data: {}
+    entity_id: media_player.living_room_home
+    service: media_player.turn_off
   mode: single
