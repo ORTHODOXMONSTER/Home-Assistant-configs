@@ -1,5 +1,5 @@
 - id: '1598082405271'
-  alias: EntryWay Light On
+  alias: EntryWay Timer Started
   description: ''
   trigger:
   - event_data:
@@ -93,7 +93,7 @@
   action:
   - entity_id: timer.entryway_light
     service: script.entryway_timer_restart
-  mode: single
+  mode: restart
 - id: '1598107653741'
   alias: Front Door Open
   description: ''
@@ -194,7 +194,8 @@
       state: 'off'
   action:
   - data: {}
-    service: script.entryway_timer_restart
+    entity_id: script.entryway_timer_restart
+    service: script.turn_on
   mode: single
 - id: '1598160423749'
   alias: Porch Motion
@@ -264,6 +265,9 @@
     value_template: '{{ states("media_player.living_kitchen") != ''playing'' }}'
   - condition: template
     value_template: '{{ states("media_player.living_room_home") != ''playing'' }}'
+  - condition: state
+    entity_id: remote.hubby
+    state: 'on'
   action:
   - data:
       entity_id: media_player.roku_ultra
@@ -290,7 +294,7 @@
     service: media_player.turn_off
   mode: single
 - id: '1598458709655'
-  alias: Porch Light On
+  alias: Porch Timer Started
   description: ''
   trigger:
   - event_data:
@@ -319,4 +323,46 @@
     domain: light
     entity_id: light.front_exterior_door
     type: turn_off
+  mode: single
+- id: '1598585199045'
+  alias: Button Click Tv Stand
+  description: ''
+  trigger:
+  - device_id: 63d3d7dfd660479f8e15a6de942b28fb
+    discovery_id: 0x00158d00013f9b9e action_single
+    domain: mqtt
+    platform: device
+    subtype: single
+    type: action
+  condition: []
+  action:
+  - data: {}
+    service: script.livingroom_lights_toggle_button
+  mode: single
+- id: '1598588347775'
+  alias: Button Triple Click TV
+  description: ''
+  trigger:
+  - device_id: 63d3d7dfd660479f8e15a6de942b28fb
+    discovery_id: 0x00158d00013f9b9e action_triple
+    domain: mqtt
+    platform: device
+    subtype: triple
+    type: action
+  condition: []
+  action:
+  - data: {}
+    service: script.livingroom_lghts_toggle
+  mode: single
+- id: '1598589380893'
+  alias: Porch Light Turned On
+  description: ''
+  trigger:
+  - entity_id: light.front_exterior_door
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data: {}
+    service: script.porch_light_timer
   mode: single

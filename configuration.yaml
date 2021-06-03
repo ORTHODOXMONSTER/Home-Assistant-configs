@@ -2,7 +2,7 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 ##this is a test
-
+discovery:
 input_boolean:
   zigbee_permit_join:
     name: Allow devices to join

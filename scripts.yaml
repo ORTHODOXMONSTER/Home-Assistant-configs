@@ -78,6 +78,7 @@ entryway_full_brightness:
       sequence:
       - data:
           brightness: 75
+        entity_id: light.entryway
         service: light.turn_on
     default: []
 hallway_conditional_brightness:
@@ -106,3 +107,24 @@ hallway_conditional_brightness:
         entity_id: light.hallway
         service: light.turn_on
     default: []
+livingroom_lights_toggle_button:
+  alias: Livingroom lights toggle button
+  mode: single
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: remote.hubby
+        state: 'off'
+      sequence:
+      - data: {}
+        entity_id: light.living_room
+        service: light.toggle
+    default: []
+livingroom_lghts_toggle:
+  alias: Livingroom  Lights Toggle
+  mode: single
+  sequence:
+  - data: {}
+    entity_id: light.living_room
+    service: light.toggle
